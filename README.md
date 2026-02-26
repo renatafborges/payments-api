@@ -126,6 +126,7 @@ Exemplo:
 #### Obter por Id:
 Exemplo:  
 `GET /responsaveis/{id}`
+
 ---
 ### Planos de Pagamento
 #### Criar Plano:
