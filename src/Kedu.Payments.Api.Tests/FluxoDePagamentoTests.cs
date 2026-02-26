@@ -239,4 +239,45 @@ public class FluxoDePagamentoTests : IClassFixture<TestApplicationFactory>
         Assert.Contains(cobrancas!, c => c.Id == cobrancaId);
         Assert.All(cobrancas!, c => Assert.Equal("EMITIDA", c.Status));
     }
+
+    [Fact]
+    public async Task RegistrarPagamento_ValorParcial_Retorna422_E_NaoMarcaComoPaga()
+    {
+        // Arrange
+        var centroId = await EnsureCentroDeCustoAsync("MENSALIDADE");
+        var responsavel = await CreateResponsavelAsync(_client, "Pagamento Parcial");
+
+        var respPlano = await _client.PostAsJsonAsync("/planos-de-pagamento", new
+        {
+            responsavelId = responsavel.Id,
+            centroDeCustoId = centroId,
+            cobrancas = new[]
+            {
+            new { valor = 100.00m, dataVencimento = "2026-03-10", metodoPagamento = "BOLETO" }
+        }
+        });
+        respPlano.EnsureSuccessStatusCode();
+
+        var plano = await respPlano.Content.ReadFromJsonAsync<PlanoResponse>();
+        Assert.NotNull(plano);
+
+        var cobrancaId = plano!.Cobrancas.Single().Id;
+
+        var respPagar = await _client.PostAsJsonAsync($"/cobrancas/{cobrancaId}/pagamentos", new
+        {
+            valor = 50.00m,
+            dataPagamento = "2026-02-25T20:00:00"
+        });
+
+        Assert.Equal((HttpStatusCode)422, respPagar.StatusCode);
+
+        var respCobrancas = await _client.GetAsync($"/responsaveis/{responsavel.Id}/cobrancas");
+        respCobrancas.EnsureSuccessStatusCode();
+
+        var cobrancas = await respCobrancas.Content.ReadFromJsonAsync<List<CobrancaResponse>>();
+        Assert.NotNull(cobrancas);
+
+        var c1 = cobrancas!.Single(x => x.Id == cobrancaId);
+        Assert.Equal("EMITIDA", c1.Status);
+    }
 }
