@@ -48,8 +48,20 @@ GET {{baseUrl}}/planos-de-pagamento/1/total
 ### Listar Planos do Responsável
 GET {{baseUrl}}/responsaveis/1/planos-de-pagamento
 
-### Listar Cobranças do Responsável (inclui vencida: bool)
+### Listar Cobranças do Responsável
 GET {{baseUrl}}/responsaveis/1/cobrancas
+
+### Listar Cobranças do Responsável Emitidas
+GET {{baseUrl}}/responsaveis/1/cobrancas?status=EMITIDA
+
+### Listar Cobranças do Responsável por Método de Pagamento PIX
+GET {{baseUrl}}/responsaveis/1/cobrancas?metodoPagamento=PIX
+
+### Listar Cobranças do Responsável Vencidas
+GET {{baseUrl}}/responsaveis/1/cobrancas?vencida=true
+
+### Listar Cobranças do Responsável Emitidas e Vencidas
+GET {{baseUrl}}/responsaveis/1/cobrancas?status=EMITIDA&vencida=true
 
 ### Quantidade de Cobranças do Responsável
 GET {{baseUrl}}/responsaveis/1/cobrancas/quantidade

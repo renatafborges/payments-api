@@ -14,7 +14,7 @@ Projeto construído como parte de um desafio técnico, contemplando modelagem de
 - PostgreSQL
 - Docker
 - xUnit (Testes de Integração)
-
+- GraphQL (HotChocolate)
 ---
 
 ## 📌 Conceitos de Domínio
@@ -108,11 +108,10 @@ dotnet test
 #### Criar centro de custo:  
 Exemplo:  
 `POST/centros-de-custo`
-
 ```json
 { "nome": "MENSALIDADE" }
 ```
-#### Listar centro de custo
+#### Listar centros de custo
 Exemplo:  
 `GET/centros-de-custo`
 
@@ -124,6 +123,9 @@ Exemplo:
 ```json
 { "nome": "Maria da Silva" }
 ```
+#### Obter por Id:
+Exemplo:  
+`GET/responsaveis/{id}`
 ---
 ### Planos de Pagamento
 #### Criar Plano:
@@ -142,7 +144,7 @@ Exemplo:
   ]
 }
 ```
-#### Obter Plano:  
+#### Obter Plano por Id:  
 Exemplo:  
 `GET/planos-de-pagamento/{id}`
 
@@ -164,9 +166,17 @@ Inclui:
 ✔ Status  
 ✔ Indicador de vencida  
 
+#### Listar planos de pagamento por Responsável:
+Exemplo:  
+`GET/responsaveis/{id}/planos-de-pagamento`
+
 #### Quantidade de cobranças:
 Exemplo:  
 `GET/responsaveis/{id}/cobrancas/quantidade`
+
+#### Listar Cobranças por Responsável:
+Exemplo:  
+`GET/responsaveis/{id}/cobrancas`
 
 ---
 ### Pagamentos
@@ -179,6 +189,98 @@ Exemplo:
   "dataPagamento": "2026-02-25T20:00:00"
 }
 ```
+
+## 🧩 GraphQL
+
+Além dos endpoints REST, a API também expõe operações via **GraphQL (HotChocolate)**.
+
+### URL
+`http://localhost:5047/graphql`
+
+Ao rodar em ambiente de desenvolvimento, o HotChocolate disponibiliza uma interface para executar consultas/mutações (GraphQL Playground).
+
+### ✅ Queries
+
+**Listar Centros de Custo**
+```graphql
+query {
+  centrosDeCusto {
+    id
+    nome
+  }
+}
+```
+
+**Consultar Responsável (com planos)**
+```graphql
+query {
+  responsavel(id: 3) {
+    id
+    nome
+    planosDePagamento {
+      id
+      total
+    }
+  }
+}
+```
+
+**Consultar Plano de Pagamento (com centro de custo e cobranças)**
+```graphql
+query {
+  planoPagamento(id: 1) {
+    id
+    total
+    centroDeCusto { id nome }
+    cobrancas {
+      id
+      valor
+      status
+      metodoPagamento
+      dataVencimento
+      codigoPagamento
+    }
+  }
+}
+```
+
+**Listar Cobranças**
+```graphql
+query {
+  cobrancas {
+    id
+    valor
+    status
+    metodoPagamento
+    dataVencimento
+  }
+}
+```
+
+**Listar Cobranças Vencidas (regra derivada)**
+```graphql
+query {
+  cobrancasVencidas {
+    id
+    valor
+    status
+    metodoPagamento
+    dataVencimento
+  }
+}
+```
+### ✅ Mutation
+**Registrar Pagamento**
+```graphql
+mutation {
+  registrarPagamento(cobrancaId: 3, valor: 350.00) {
+    cobrancaId
+    status
+  }
+}
+```
+Observação: a data do pagamento é registrada usando horário local (compatível com timestamp without time zone no PostgreSQL).
+
 ---
 
 ### 🎯 Objetivos

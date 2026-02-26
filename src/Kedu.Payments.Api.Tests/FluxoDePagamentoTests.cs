@@ -212,4 +212,31 @@ public class FluxoDePagamentoTests : IClassFixture<TestApplicationFactory>
         var criarCentroDeCustoDuplicado = await _client.PostAsJsonAsync("/centros-de-custo", new { nome = "TAXA_DE_PROVA" });
         Assert.Equal(HttpStatusCode.Conflict, criarCentroDeCustoDuplicado.StatusCode);
     }
+
+    [Fact]
+    public async Task ListarCobrancas_FiltraPorStatus()
+    {
+        var centroId = await EnsureCentroDeCustoAsync("MENSALIDADE");
+        var responsavel = await CreateResponsavelAsync(_client, "Filtro Status");
+
+        var respPlano = await _client.PostAsJsonAsync("/planos-de-pagamento", new
+        {
+            responsavelId = responsavel.Id,
+            centroDeCustoId = centroId,
+            cobrancas = new[] { new { valor = 120.00m, dataVencimento = "2026-03-10", metodoPagamento = "BOLETO" } }
+        });
+        respPlano.EnsureSuccessStatusCode();
+
+        var plano = await respPlano.Content.ReadFromJsonAsync<PlanoResponse>();
+        var cobrancaId = plano!.Cobrancas.Single().Id;
+
+        var resp = await _client.GetAsync($"/responsaveis/{responsavel.Id}/cobrancas?status=EMITIDA");
+        resp.EnsureSuccessStatusCode();
+
+        var cobrancas = await resp.Content.ReadFromJsonAsync<List<CobrancaResponse>>();
+        Assert.NotNull(cobrancas);
+
+        Assert.Contains(cobrancas!, c => c.Id == cobrancaId);
+        Assert.All(cobrancas!, c => Assert.Equal("EMITIDA", c.Status));
+    }
 }

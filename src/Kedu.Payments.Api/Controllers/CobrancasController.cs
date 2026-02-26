@@ -9,11 +9,11 @@ namespace Kedu.Payments.Api.Controllers;
 
 [ApiController]
 [Route("cobrancas/{cobrancaId:int}/pagamentos")]
-public class PagamentosController : ControllerBase
+public class CobrancasController : ControllerBase
 {
     private readonly AppDbContext _context;
 
-    public PagamentosController(AppDbContext context)
+    public CobrancasController(AppDbContext context)
     {
         _context = context;
     }
@@ -21,9 +21,6 @@ public class PagamentosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Registrar(int cobrancaId, [FromBody] RegistrarPagamentoRequest request)
     {
-        if (request.Valor <= 0)
-            return BadRequest("Valor do pagamento deve ser maior que zero.");
-
         var cobranca = await _context.Cobrancas
             .Include(c => c.Pagamentos)
             .FirstOrDefaultAsync(c => c.Id == cobrancaId);
@@ -33,6 +30,11 @@ public class PagamentosController : ControllerBase
 
         if (cobranca.Status == StatusCobranca.CANCELADA)
             return UnprocessableEntity("Não é permitido pagar uma cobrança CANCELADA.");
+
+        if (request.Valor <= 0) return BadRequest("Valor inválido.");
+
+        if (request.Valor != cobranca.Valor)
+            return UnprocessableEntity("Pagamento parcial não é permitido. O valor deve ser igual ao valor da cobrança.");
 
         var pagamento = new Pagamento
         {

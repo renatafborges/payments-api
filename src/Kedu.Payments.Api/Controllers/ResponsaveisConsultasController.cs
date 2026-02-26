@@ -52,16 +52,38 @@ public class ResponsaveisConsultasController : ControllerBase
     }
 
     [HttpGet("cobrancas")]
-    public async Task<IActionResult> ListarCobrancas(int responsavelId)
+    public async Task<IActionResult> ListarCobrancas(
+    int responsavelId,
+    string? status,
+    string? metodoPagamento,
+    bool? vencida)
     {
         var existe = await _context.Responsaveis.AnyAsync(r => r.Id == responsavelId);
         if (!existe) return NotFound($"Responsável {responsavelId} não encontrado.");
 
         var hoje = DateTime.Now.Date;
 
-        var cobrancas = await _context.Cobrancas
+        var query = _context.Cobrancas
             .AsNoTracking()
-            .Where(c => c.PlanoPagamento.ResponsavelId == responsavelId)
+            .Where(c => c.PlanoPagamento.ResponsavelId == responsavelId);
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            if (!Enum.TryParse<StatusCobranca>(status, ignoreCase: true, out var statusEnum))
+                return BadRequest("Parâmetro 'status' inválido. Use: EMITIDA, PAGA ou CANCELADA.");
+
+            query = query.Where(c => c.Status == statusEnum);
+        }
+
+        if (!string.IsNullOrWhiteSpace(metodoPagamento))
+        {
+            if (!Enum.TryParse<MetodoPagamento>(metodoPagamento, ignoreCase: true, out var metodoEnum))
+                return BadRequest("Parâmetro 'metodoPagamento' inválido. Use: PIX ou BOLETO.");
+
+            query = query.Where(c => c.MetodoPagamento == metodoEnum);
+        }
+
+        var cobrancas = await query
             .Select(c => new CobrancaDetalhadaResponse
             {
                 Id = c.Id,
@@ -77,6 +99,9 @@ public class ResponsaveisConsultasController : ControllerBase
             })
             .OrderBy(c => c.DataVencimento)
             .ToListAsync();
+
+        if (vencida.HasValue)
+            cobrancas = cobrancas.Where(c => c.Vencida == vencida.Value).ToList();
 
         return Ok(cobrancas);
     }
