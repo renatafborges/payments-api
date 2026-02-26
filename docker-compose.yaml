@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: kedu
+      POSTGRES_PASSWORD: kedu
+      POSTGRES_DB: kedu_payments
+    ports:
+      - "5433:5432"
+    volumes:
+      - kedu_pg:/var/lib/postgresql/data
+
+volumes:
+  kedu_pg:

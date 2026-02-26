@@ -1,0 +1,19 @@
+# Build
+**/bin/
+**/obj/
+
+# IDEs
+.vscode/
+.vs/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Configurações locais / segredos
+**/appsettings.Development.json
+.env
+
+# Logs
+*.log
