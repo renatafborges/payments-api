@@ -102,6 +102,8 @@ Executar testes de Integração:
 ```bash
 dotnet test
 ```
+Windows: se ocorrer erro de arquivo bloqueado ao build (MSB3027/MSB3021), finalize a execução da API (Ctrl+C) e tente novamente.
+
 ---
 ## 📡 Endpoints Principais
 ### Centro de Custo
