@@ -1,6 +1,6 @@
 # Kedu Payments API
-
-API REST desenvolvida em **.NET 8** para gerenciamento de planos de pagamento, cobranças e pagamentos.
+API REST + GraphQL com testes de integração e execução via Docker.
+Aplicação desenvolvida em **.NET 8** para gerenciamento de planos de pagamento, cobranças e pagamentos.
 
 Projeto construído como parte de um desafio técnico, contemplando modelagem de domínio, regras de negócio, persistência relacional e endpoints REST.
 
@@ -107,30 +107,30 @@ dotnet test
 ### Centro de Custo
 #### Criar centro de custo:  
 Exemplo:  
-`POST/centros-de-custo`
+`POST /centros-de-custo`
 ```json
 { "nome": "MENSALIDADE" }
 ```
 #### Listar centros de custo
 Exemplo:  
-`GET/centros-de-custo`
+`GET /centros-de-custo`
 
 ---
 ### Responsáveis
 #### Criar Responsável:
 Exemplo:  
-`POST/responsaveis`
+`POST /responsaveis`
 ```json
 { "nome": "Maria da Silva" }
 ```
 #### Obter por Id:
 Exemplo:  
-`GET/responsaveis/{id}`
+`GET /responsaveis/{id}`
 ---
 ### Planos de Pagamento
 #### Criar Plano:
 Exemplo:  
-`POST/planos-de-pagamento`
+`POST /planos-de-pagamento`
 ```json
 {
   "responsavelId": 1,
@@ -146,7 +146,7 @@ Exemplo:
 ```
 #### Obter Plano por Id:  
 Exemplo:  
-`GET/planos-de-pagamento/{id}`
+`GET /planos-de-pagamento/{id}`
 
 #### Obter Total:  
 Exemplo:  
@@ -156,7 +156,7 @@ Exemplo:
 ### Cobranças
 #### Listar cobranças do Responsável:
 Exemplo:  
-`GET/responsaveis/{id}/cobrancas`  
+`GET /responsaveis/{id}/cobrancas`  
 
 Inclui:   
 ✔ Valor  
@@ -168,21 +168,17 @@ Inclui:
 
 #### Listar planos de pagamento por Responsável:
 Exemplo:  
-`GET/responsaveis/{id}/planos-de-pagamento`
+`GET /responsaveis/{id}/planos-de-pagamento`
 
 #### Quantidade de cobranças:
 Exemplo:  
-`GET/responsaveis/{id}/cobrancas/quantidade`
-
-#### Listar Cobranças por Responsável:
-Exemplo:  
-`GET/responsaveis/{id}/cobrancas`
+`GET /responsaveis/{id}/cobrancas/quantidade`
 
 ---
 ### Pagamentos
 #### Registrar pagamento:
 Exemplo:  
-`POST/cobrancas/{id}/pagamentos`  
+`POST /cobrancas/{id}/pagamentos`  
 ```json
 {
   "valor": 350.00,
@@ -296,7 +292,7 @@ Observação: a data do pagamento é registrada usando horário local (compatív
 ---
 ### 📌 Observações
 - Códigos de pagamento são simulados
-- Pagamentos parciais foram simplificados (pagamento total)
+- Pagamentos parciais não são permitidos (é exigido pagamento integral da cobrança).
 - Status VENCIDA é calculado dinamicamente
 
 --- 
