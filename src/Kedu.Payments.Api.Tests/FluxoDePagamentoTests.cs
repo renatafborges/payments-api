@@ -243,7 +243,6 @@ public class FluxoDePagamentoTests : IClassFixture<TestApplicationFactory>
     [Fact]
     public async Task RegistrarPagamento_ValorParcial_Retorna422_E_NaoMarcaComoPaga()
     {
-        // Arrange
         var centroId = await EnsureCentroDeCustoAsync("MENSALIDADE");
         var responsavel = await CreateResponsavelAsync(_client, "Pagamento Parcial");
 
