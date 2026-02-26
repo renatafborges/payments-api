@@ -1,0 +1,79 @@
+@baseUrl = http://localhost:5047
+
+### Criar Centro de Custo: MATRICULA
+POST {{baseUrl}}/centros-de-custo
+Content-Type: application/json
+
+{ "nome": "MATRICULA" }
+
+### Criar Centro de Custo: MENSALIDADE
+POST {{baseUrl}}/centros-de-custo
+Content-Type: application/json
+
+{ "nome": "MENSALIDADE" }
+
+### Listar Centros de Custo
+GET {{baseUrl}}/centros-de-custo
+
+### Criar Responsável
+POST {{baseUrl}}/responsaveis
+Content-Type: application/json
+
+{
+  "nome": "Maria Silva"
+}
+
+### Obter Responsável por Id (ajuste o id se necessário)
+GET {{baseUrl}}/responsaveis/1
+
+### Criar Plano (CentroDeCustoId = 1 -> MATRICULA)
+POST {{baseUrl}}/planos-de-pagamento
+Content-Type: application/json
+
+{
+  "responsavelId": 1,
+  "centroDeCustoId": 1,
+  "cobrancas": [
+    { "valor": 350.00, "dataVencimento": "2026-03-10", "metodoPagamento": "BOLETO" },
+    { "valor": 350.00, "dataVencimento": "2026-04-10", "metodoPagamento": "PIX" }
+  ]
+}
+
+### Obter Plano por Id (ajuste o id se necessário)
+GET {{baseUrl}}/planos-de-pagamento/1
+
+### Obter Total do Plano
+GET {{baseUrl}}/planos-de-pagamento/1/total
+
+### Listar Planos do Responsável
+GET {{baseUrl}}/responsaveis/1/planos-de-pagamento
+
+### Listar Cobranças do Responsável (inclui vencida: bool)
+GET {{baseUrl}}/responsaveis/1/cobrancas
+
+### Quantidade de Cobranças do Responsável
+GET {{baseUrl}}/responsaveis/1/cobrancas/quantidade
+
+### Registrar Pagamento na Cobrança 1 (ajuste o id da cobrança)
+POST {{baseUrl}}/cobrancas/1/pagamentos
+Content-Type: application/json
+
+{
+  "valor": 350.00,
+  "dataPagamento": "2026-02-25T20:00:00"
+}
+
+### Criar Plano com cobrança vencida (CentroDeCustoId = 2 -> MENSALIDADE)
+POST {{baseUrl}}/planos-de-pagamento
+Content-Type: application/json
+
+{
+  "responsavelId": 1,
+  "centroDeCustoId": 2,
+  "cobrancas": [
+    { "valor": 99.90, "dataVencimento": "2020-01-10", "metodoPagamento": "BOLETO" }
+  ]
+}
+
+### Listar Cobranças do Responsável novamente e ver vencida=true na cobrança antiga
+GET {{baseUrl}}/responsaveis/1/cobrancas
